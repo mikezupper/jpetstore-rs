@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT i.itemid as \"id: ItemId\", i.productid as \"product_id: ProductId\",\n                  i.listprice as \"list_price!: Cents\", i.attr1 as \"attribute\",\n                  inv.qty as \"quantity!: i64\"\n           FROM item i JOIN inventory inv ON inv.itemid = i.itemid\n           WHERE i.productid = ?1 ORDER BY i.itemid",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: ItemId",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "item",
+            "name": "itemid"
+          }
+        }
+      },
+      {
+        "name": "product_id: ProductId",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "item",
+            "name": "productid"
+          }
+        }
+      },
+      {
+        "name": "list_price!: Cents",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "item",
+            "name": "listprice"
+          }
+        }
+      },
+      {
+        "name": "attribute",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "item",
+            "name": "attr1"
+          }
+        }
+      },
+      {
+        "name": "quantity!: i64",
+        "ordinal": 4,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "inventory",
+            "name": "qty"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "0d634d07ab51091557f1c5f3c20bb84ccdae29f3e6958d85baca2d03e937df59"
+}

@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT catid as \"id: CategoryId\", name as \"name!\", descn as \"description!\"\n           FROM category ORDER BY name",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: CategoryId",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "category",
+            "name": "catid"
+          }
+        }
+      },
+      {
+        "name": "name!",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "category",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "description!",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "category",
+            "name": "descn"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "bbaf307e551c1ae2ed1070af08551f33d9ec791641b8cf95df24cd45f032e275"
+}

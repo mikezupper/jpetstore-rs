@@ -21,3 +21,5 @@ pub async fn pool(url: &str) -> Result<SqlitePool, DbInitError> {
     sqlx::migrate!().run(&pool).await?;
     Ok(pool)
 }
+
+pub mod catalog;

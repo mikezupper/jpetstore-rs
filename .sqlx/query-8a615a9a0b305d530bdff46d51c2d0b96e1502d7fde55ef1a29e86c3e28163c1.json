@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT productid as \"id: ProductId\", category as \"category_id: CategoryId\",\n                  name as \"name!\", descn as \"description!\"\n           FROM product WHERE category = ?1 ORDER BY productid",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: ProductId",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "product",
+            "name": "productid"
+          }
+        }
+      },
+      {
+        "name": "category_id: CategoryId",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "product",
+            "name": "category"
+          }
+        }
+      },
+      {
+        "name": "name!",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "product",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "description!",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "product",
+            "name": "descn"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "8a615a9a0b305d530bdff46d51c2d0b96e1502d7fde55ef1a29e86c3e28163c1"
+}

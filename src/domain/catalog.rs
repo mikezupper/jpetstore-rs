@@ -1,0 +1,121 @@
+//! The catalog as types.
+//!
+//! The rule here is parse-don't-validate: raw strings from URLs or forms get
+//! checked once, at construction, and everything past that point handles a
+//! type that is valid by existence. There is no function in this app that
+//! takes a "product id string" and hopes.
+
+use std::fmt;
+
+#[derive(Debug, thiserror::Error)]
+#[error("not a valid id: {reason}")]
+pub struct InvalidId {
+    reason: &'static str,
+}
+
+// Matches the schema's varchar(10) id columns. The check is deliberately
+// dumb — length and emptiness — because the goal is a boundary, not a
+// format spec the seed data doesn't actually follow.
+fn validate_id(raw: &str) -> Result<(), InvalidId> {
+    if raw.is_empty() {
+        return Err(InvalidId { reason: "empty" });
+    }
+    if raw.len() > 10 {
+        return Err(InvalidId { reason: "longer than 10 characters" });
+    }
+    Ok(())
+}
+
+// One newtype per id the catalog knows. They wrap the same kind of string,
+// and that's the point: the compiler now refuses to pass a product id where
+// a category id belongs — the mix-up MyBatis mappers can't catch.
+
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct CategoryId(String);
+
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct ProductId(String);
+
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct ItemId(String);
+
+macro_rules! id_impls {
+    ($t:ident) => {
+        impl $t {
+            pub fn as_str(&self) -> &str {
+                &self.0
+            }
+        }
+        impl TryFrom<String> for $t {
+            type Error = InvalidId;
+            fn try_from(raw: String) -> Result<Self, InvalidId> {
+                validate_id(&raw)?;
+                Ok(Self(raw))
+            }
+        }
+        impl fmt::Display for $t {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                f.write_str(&self.0)
+            }
+        }
+    };
+}
+
+id_impls!(CategoryId);
+id_impls!(ProductId);
+id_impls!(ItemId);
+
+/// Money as integer cents (see migrations/0001_schema.sql). Arithmetic on
+/// i64 is exact; formatting as dollars is a display concern that lesson 5
+/// owns, which is why there's no Display impl here yet.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct Cents(pub i64);
+
+pub struct Category {
+    pub id: CategoryId,
+    pub name: String,
+    pub description: String,
+}
+
+pub struct Product {
+    pub id: ProductId,
+    pub category_id: CategoryId,
+    pub name: String,
+    pub description: String,
+}
+
+/// A purchasable item, joined with its live inventory count — the shape the
+/// product page needs, which is the shape the query returns. attr1 is the
+/// only attribute column the seed data uses; the other four stay in the
+/// schema, unloved, exactly like the original.
+pub struct Item {
+    pub id: ItemId,
+    pub product_id: ProductId,
+    pub list_price: Cents,
+    pub attribute: Option<String>,
+    pub quantity: i64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn ids_reject_garbage() {
+        assert!(CategoryId::try_from(String::new()).is_err());
+        assert!(ItemId::try_from("X".repeat(11)).is_err());
+        assert!(ProductId::try_from("FI-SW-01".to_string()).is_ok());
+    }
+
+    #[test]
+    fn cents_compare_exactly() {
+        // No arithmetic impls yet — the cart adds them in lesson 7, when
+        // something actually needs to add money.
+        assert!(Cents(1650) > Cents(1649));
+        assert_eq!(Cents(550), Cents(550));
+    }
+}

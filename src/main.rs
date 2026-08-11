@@ -1,4 +1,5 @@
 mod db;
+mod domain;
 mod web;
 
 // Startup errors and request errors get different treatment on purpose:
