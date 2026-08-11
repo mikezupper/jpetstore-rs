@@ -1,5 +1,5 @@
 use askama::Template;
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::response::Html;
 use sqlx::SqlitePool;
 
@@ -58,6 +58,35 @@ pub async fn product(
     let product = db::catalog::product(&pool, &id).await?.ok_or(AppError::NotFound)?;
     let items = db::catalog::items_for_product(&pool, &id).await?;
     Ok(Html(ProductTemplate { product, items }.render()?))
+}
+
+// The query string, parsed into a struct by serde before the handler runs.
+// #[serde(default)] makes a bare /search (no ?keyword=) mean "empty search"
+// instead of a 400 — the form page itself is a valid page to land on.
+#[derive(serde::Deserialize)]
+pub struct SearchParams {
+    #[serde(default)]
+    keyword: String,
+}
+
+#[derive(Template)]
+#[template(path = "search.html")]
+struct SearchTemplate {
+    keyword: String,
+    products: Vec<Product>,
+}
+
+pub async fn search(
+    State(pool): State<SqlitePool>,
+    Query(params): Query<SearchParams>,
+) -> AppResult<Html<String>> {
+    let keyword = params.keyword.trim();
+    let products = if keyword.is_empty() {
+        Vec::new()
+    } else {
+        db::catalog::search_products(&pool, keyword).await?
+    };
+    Ok(Html(SearchTemplate { keyword: keyword.to_string(), products }.render()?))
 }
 
 #[derive(Template)]

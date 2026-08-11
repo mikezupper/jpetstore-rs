@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Search — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Search</h2>
+
+{% if keyword.is_empty() %}
+<p>Type something in the search box above — a name, a species, a vibe.</p>
+{% else if products.is_empty() %}
+<p>Nothing in the store matches “{{ keyword }}”.</p>
+{% else %}
+<p>Products matching “{{ keyword }}”:</p>
+<table>
+    <thead>
+    <tr><th>Product ID</th><th>Name</th></tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+    <tr>
+        <td><a href="/products/{{ product.id }}">{{ product.id }}</a></td>
+        <td>{{ product.name }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

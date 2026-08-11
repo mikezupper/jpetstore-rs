@@ -10,6 +10,7 @@ use sqlx::SqlitePool;
 pub fn router(pool: SqlitePool) -> Router {
     Router::new()
         .route("/", get(catalog::home))
+        .route("/search", get(catalog::search))
         .route("/categories/{id}", get(catalog::category))
         .route("/products/{id}", get(catalog::product))
         .route("/items/{id}", get(catalog::item))

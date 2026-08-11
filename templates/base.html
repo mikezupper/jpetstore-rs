@@ -27,6 +27,10 @@
 <header>
     <h1><a href="/" style="text-decoration:none; color:inherit;">JPetStore</a></h1>
     <p>the pet store you already know — now in Rust</p>
+    <form action="/search" method="get">
+        <input type="search" name="keyword" placeholder="Search the store">
+        <button>Search</button>
+    </form>
 </header>
 <main>
 {% block content %}{% endblock %}

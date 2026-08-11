@@ -89,6 +89,28 @@ pub async fn item(pool: &SqlitePool, id: &ItemId) -> Result<Option<Item>, sqlx::
     .await
 }
 
+/// Case-insensitive substring match over product names and descriptions,
+/// mirroring the original's searchProductList. The keyword is always a bound
+/// parameter — with query_as! there is no way to splice it into the SQL
+/// text, which is the point (see lesson 6 on MyBatis's ${} scar).
+pub async fn search_products(
+    pool: &SqlitePool,
+    keyword: &str,
+) -> Result<Vec<Product>, sqlx::Error> {
+    let pattern = format!("%{}%", keyword.to_lowercase());
+    sqlx::query_as!(
+        Product,
+        r#"SELECT productid as "id: ProductId", category as "category_id: CategoryId",
+                  name as "name!", descn as "description!"
+           FROM product
+           WHERE lower(name) LIKE ?1 OR lower(descn) LIKE ?1
+           ORDER BY productid"#,
+        pattern
+    )
+    .fetch_all(pool)
+    .await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -130,6 +152,21 @@ mod tests {
         assert_eq!(est1.list_price, Cents(1650));
         assert_eq!(est1.attribute.as_deref(), Some("Large"));
         assert_eq!(est1.quantity, 10000);
+    }
+
+    #[tokio::test]
+    async fn search_matches_names_and_descriptions_case_insensitively() {
+        let pool = test_pool().await;
+        // Angelfish and Goldfish by name; Tiger Shark and Koi only via
+        // "…fish from…" in their descriptions.
+        assert_eq!(search_products(&pool, "fish").await.unwrap().len(), 4);
+        assert_eq!(search_products(&pool, "FISH").await.unwrap().len(), 4);
+    }
+
+    #[tokio::test]
+    async fn search_misses_come_back_empty() {
+        let pool = test_pool().await;
+        assert!(search_products(&pool, "zebra").await.unwrap().is_empty());
     }
 
     #[tokio::test]
