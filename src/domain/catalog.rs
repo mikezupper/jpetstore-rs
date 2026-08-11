@@ -38,7 +38,10 @@ pub struct CategoryId(String);
 #[sqlx(transparent)]
 pub struct ProductId(String);
 
-#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type)]
+// ItemId also derives serde because it rides inside the session cart;
+// a serde newtype struct serializes as its inner value, so the cookie
+// payload stays plain.
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(transparent)]
 pub struct ItemId(String);
 
@@ -71,13 +74,29 @@ id_impls!(ItemId);
 /// Money as integer cents (see migrations/0001_schema.sql). Arithmetic on
 /// i64 is exact; Display is how a price becomes "$16.50" in a template,
 /// and it's the only place in the app that knows about dollar signs.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, sqlx::Type)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(transparent)]
 pub struct Cents(pub i64);
 
 impl fmt::Display for Cents {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "${}.{:02}", self.0 / 100, self.0 % 100)
+    }
+}
+
+// The only arithmetic money supports is what the cart actually does:
+// scale a unit price by a quantity, and sum subtotals. There is still no
+// `Add` — nothing in the app adds two prices directly, so that operation
+// doesn't exist yet.
+impl Cents {
+    pub fn times(self, quantity: u32) -> Cents {
+        Cents(self.0 * i64::from(quantity))
+    }
+}
+
+impl std::iter::Sum for Cents {
+    fn sum<I: Iterator<Item = Cents>>(iter: I) -> Self {
+        Cents(iter.map(|c| c.0).sum())
     }
 }
 

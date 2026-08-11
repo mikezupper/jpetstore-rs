@@ -5,15 +5,7 @@ use sqlx::SqlitePool;
 
 use crate::db;
 use crate::domain::catalog::{Category, CategoryId, Item, ItemId, Product, ProductId};
-use crate::web::{AppError, AppResult};
-
-// A raw path segment becomes a typed id here, at the boundary, or the
-// request is over. An id that can't even be parsed names nothing — that's
-// a 404, the same as an id that parses but isn't in the catalog. Nobody
-// past this line handles a raw string.
-fn parse_id<T: TryFrom<String>>(raw: String) -> Result<T, AppError> {
-    T::try_from(raw).map_err(|_| AppError::NotFound)
-}
+use crate::web::{parse_id, AppError, AppResult};
 
 #[derive(Template)]
 #[template(path = "home.html")]

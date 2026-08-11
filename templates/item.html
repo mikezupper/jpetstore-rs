@@ -10,6 +10,9 @@
 {% endif %}
 <p>{{ parts.text }}</p>
 <p><strong>{{ item.list_price }}</strong> — {{ item.quantity }} in stock</p>
-<p><em>Add to cart arrives in lesson 7.</em></p>
+<form method="post" action="/cart/items">
+    <input type="hidden" name="item_id" value="{{ item.id }}">
+    <button>Add to Cart</button>
+</form>
 <p><a href="/products/{{ item.product_id }}">← Back to {{ product.name }}</a></p>
 {% endblock %}

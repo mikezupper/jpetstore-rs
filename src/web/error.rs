@@ -13,6 +13,8 @@ pub enum AppError {
     Template(#[from] askama::Error),
     #[error("A database query failed.")]
     Database(#[from] sqlx::Error),
+    #[error("The session store failed.")]
+    Session(#[from] tower_sessions::session::Error),
 }
 
 pub type AppResult<T> = Result<T, AppError>;
@@ -30,6 +32,7 @@ impl IntoResponse for AppError {
             AppError::NotFound => StatusCode::NOT_FOUND,
             AppError::Template(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::Session(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
         let page = ErrorTemplate {
             status: status.as_u16(),

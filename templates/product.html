@@ -12,7 +12,7 @@
 
 <table>
     <thead>
-    <tr><th>Item ID</th><th>Description</th><th>Price</th><th>In stock</th></tr>
+    <tr><th>Item ID</th><th>Description</th><th>Price</th><th>In stock</th><th></th></tr>
     </thead>
     <tbody>
     {% for item in items %}
@@ -21,6 +21,12 @@
         <td>{% if let Some(attr) = item.attribute %}{{ attr }} {% endif %}{{ product.name }}</td>
         <td>{{ item.list_price }}</td>
         <td>{{ item.quantity }}</td>
+        <td>
+            <form method="post" action="/cart/items">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button>Add to Cart</button>
+            </form>
+        </td>
     </tr>
     {% endfor %}
     </tbody>
