@@ -11,6 +11,8 @@ pub enum AppError {
     NotFound,
     #[error("The page failed to render.")]
     Template(#[from] askama::Error),
+    #[error("A database query failed.")]
+    Database(#[from] sqlx::Error),
 }
 
 pub type AppResult<T> = Result<T, AppError>;
@@ -27,6 +29,7 @@ impl IntoResponse for AppError {
         let status = match &self {
             AppError::NotFound => StatusCode::NOT_FOUND,
             AppError::Template(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
         let page = ErrorTemplate {
             status: status.as_u16(),

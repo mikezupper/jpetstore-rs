@@ -3,9 +3,10 @@
 {% block content %}
 <h2>Under construction</h2>
 <p>
-    The catalog arrives in lesson 5. Right now this page exists to prove the
-    template pipeline works: it extends a base layout, it renders on the
-    server, and if a template variable is ever misspelled, that's a compile
-    error — not a runtime 500.
+    The storefront arrives in lesson 5, but the stockroom is full:
+    <strong>{{ products }} products</strong> across
+    <strong>{{ categories }} categories</strong> are seeded and waiting in
+    the database. These numbers come from live queries — if you see them,
+    the pool, the migrations, and the seed data all work.
 </p>
 {% endblock %}

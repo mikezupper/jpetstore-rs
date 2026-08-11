@@ -1,3 +1,4 @@
+mod db;
 mod web;
 
 // Startup errors and request errors get different treatment on purpose:
@@ -7,7 +8,10 @@ mod web;
 // that render as error pages (see web/error.rs).
 #[tokio::main]
 async fn main() {
-    let app = web::router();
+    let pool = db::pool("sqlite:jpetstore.db")
+        .await
+        .expect("database init failed");
+    let app = web::router(pool);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8081")
         .await
