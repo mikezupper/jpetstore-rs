@@ -1,0 +1,98 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT firstname as \"first_name!\", lastname as \"last_name!\",\n                  addr1 as \"address!\", city as \"city!\", state as \"state!\",\n                  zip as \"zip!\", country as \"country!\"\n           FROM account WHERE userid = ?1",
+  "describe": {
+    "columns": [
+      {
+        "name": "first_name!",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "firstname"
+          }
+        }
+      },
+      {
+        "name": "last_name!",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "lastname"
+          }
+        }
+      },
+      {
+        "name": "address!",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "addr1"
+          }
+        }
+      },
+      {
+        "name": "city!",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "name": "state!",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "state"
+          }
+        }
+      },
+      {
+        "name": "zip!",
+        "ordinal": 5,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "zip"
+          }
+        }
+      },
+      {
+        "name": "country!",
+        "ordinal": 6,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "account",
+            "name": "country"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3402c1b479640ce36da6787ebdba7527bece4ad3a6f697302b3ac12b1ef8e305"
+}

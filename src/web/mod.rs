@@ -1,6 +1,7 @@
 mod account;
 mod assets;
 mod cart;
+mod checkout;
 mod catalog;
 mod error;
 
@@ -29,6 +30,8 @@ pub fn router(pool: SqlitePool) -> Router {
         .route("/cart/items", post(cart::add))
         .route("/cart/update", post(cart::update))
         .route("/cart/remove", post(cart::remove))
+        .route("/checkout", get(checkout::form).post(checkout::submit))
+        .route("/checkout/confirm", get(checkout::confirm))
         .route("/signin", get(account::signin_form).post(account::signin))
         .route("/register", get(account::register_form).post(account::register))
         .route("/signout", post(account::signout))

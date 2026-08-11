@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Checkout</h2>
+
+{% if let Some(message) = error %}
+<p><strong>{{ message }}</strong></p>
+{% endif %}
+
+<form method="post" action="/checkout">
+    <h3>Billing address</h3>
+    <p><label>First name <input name="bill_first_name" value="{{ bill.first_name }}" required></label></p>
+    <p><label>Last name <input name="bill_last_name" value="{{ bill.last_name }}" required></label></p>
+    <p><label>Address <input name="bill_address" value="{{ bill.address }}" required></label></p>
+    <p><label>City <input name="bill_city" value="{{ bill.city }}" required></label></p>
+    <p><label>State <input name="bill_state" value="{{ bill.state }}" required></label></p>
+    <p><label>ZIP <input name="bill_zip" value="{{ bill.zip }}" required></label></p>
+    <p><label>Country <input name="bill_country" value="{{ bill.country }}" required></label></p>
+
+    <h3>Shipping address</h3>
+    <p><label>First name <input name="ship_first_name" value="{{ bill.first_name }}" required></label></p>
+    <p><label>Last name <input name="ship_last_name" value="{{ bill.last_name }}" required></label></p>
+    <p><label>Address <input name="ship_address" value="{{ bill.address }}" required></label></p>
+    <p><label>City <input name="ship_city" value="{{ bill.city }}" required></label></p>
+    <p><label>State <input name="ship_state" value="{{ bill.state }}" required></label></p>
+    <p><label>ZIP <input name="ship_zip" value="{{ bill.zip }}" required></label></p>
+    <p><label>Country <input name="ship_country" value="{{ bill.country }}" required></label></p>
+
+    <h3>Payment</h3>
+    <p><label>Card type
+        <select name="card_type" required>
+            <option>Visa</option>
+            <option>MasterCard</option>
+            <option>American Express</option>
+        </select>
+    </label></p>
+    <p><label>Card number <input name="card_number" placeholder="9999 9999 9999 9999" required></label></p>
+    <p><em>This store never charges or stores card numbers — the field exists
+        because the original's flow has it, and the lesson explains where it
+        goes (nowhere).</em></p>
+
+    <p><button>Continue</button></p>
+</form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Order — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Confirm your order</h2>
+
+<h3>Ship to</h3>
+<p>{{ draft.ship.first_name }} {{ draft.ship.last_name }}<br>
+    {{ draft.ship.address }}<br>
+    {{ draft.ship.city }}, {{ draft.ship.state }} {{ draft.ship.zip }}, {{ draft.ship.country }}</p>
+
+<h3>Bill to</h3>
+<p>{{ draft.bill.first_name }} {{ draft.bill.last_name }}<br>
+    {{ draft.bill.address }}<br>
+    {{ draft.bill.city }}, {{ draft.bill.state }} {{ draft.bill.zip }}, {{ draft.bill.country }}</p>
+
+<p>Paying with {{ draft.card_type.as_str() }}.</p>
+
+<h3>Items</h3>
+<table>
+    <thead>
+    <tr><th>Item</th><th>Description</th><th>Qty</th><th>Subtotal</th></tr>
+    </thead>
+    <tbody>
+    {% for line in cart.lines() %}
+    <tr>
+        <td>{{ line.item_id }}</td>
+        <td>{{ line.name }}</td>
+        <td>{{ line.quantity }}</td>
+        <td>{{ line.subtotal() }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><strong>Total: {{ cart.total() }}</strong></p>
+
+<p><em>The Place Order button arrives in lesson 10, wired to a transaction.</em></p>
+<p><a href="/checkout">← Edit addresses</a></p>
+{% endblock %}

@@ -1,6 +1,21 @@
 use sqlx::SqlitePool;
 
 use crate::domain::account::NewAccount;
+use crate::domain::order::Address;
+
+/// The account's address block, shaped for prefilling checkout forms.
+pub async fn address(pool: &SqlitePool, username: &str) -> Result<Option<Address>, sqlx::Error> {
+    sqlx::query_as!(
+        Address,
+        r#"SELECT firstname as "first_name!", lastname as "last_name!",
+                  addr1 as "address!", city as "city!", state as "state!",
+                  zip as "zip!", country as "country!"
+           FROM account WHERE userid = ?1"#,
+        username
+    )
+    .fetch_optional(pool)
+    .await
+}
 
 /// The stored PHC hash for a username, if the user exists. Sign-in decides
 /// what to do with the two Nones (unknown user, wrong password) — this

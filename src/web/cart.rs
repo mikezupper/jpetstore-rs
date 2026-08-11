@@ -15,7 +15,7 @@ const CART_KEY: &str = "cart";
 // The session stores the cart under one key; these two helpers are the
 // only code that knows that. A missing cart and an empty cart are the
 // same thing, which is why load() defaults instead of erroring.
-async fn load(session: &Session) -> AppResult<Cart> {
+pub(crate) async fn load(session: &Session) -> AppResult<Cart> {
     Ok(session.get::<Cart>(CART_KEY).await?.unwrap_or_default())
 }
 
