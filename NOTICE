@@ -1,0 +1,7 @@
+jpetstore-rs
+Copyright 2026 Mike Zupper
+
+This product is a port of JPetStore 6 (https://github.com/mybatis/jpetstore-6),
+Copyright 2010-2026 the original author or authors, licensed under the
+Apache License, Version 2.0. The database schema, seed data, and application
+behavior derive from that project.
