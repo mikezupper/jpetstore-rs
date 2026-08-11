@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Account — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Your Account</h2>
+<p>Signed in as <strong>{{ username }}</strong>.</p>
+<p>Order history and profile editing arrive in lesson 11.</p>
+<form method="post" action="/signout">
+    <button>Sign Out</button>
+</form>
+{% endblock %}

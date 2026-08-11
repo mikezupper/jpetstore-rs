@@ -15,6 +15,8 @@ pub enum AppError {
     Database(#[from] sqlx::Error),
     #[error("The session store failed.")]
     Session(#[from] tower_sessions::session::Error),
+    #[error("Password hashing failed.")]
+    Hashing,
 }
 
 pub type AppResult<T> = Result<T, AppError>;
@@ -33,6 +35,7 @@ impl IntoResponse for AppError {
             AppError::Template(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Session(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::Hashing => StatusCode::INTERNAL_SERVER_ERROR,
         };
         let page = ErrorTemplate {
             status: status.as_u16(),

@@ -1,3 +1,4 @@
+mod account;
 mod assets;
 mod cart;
 mod catalog;
@@ -28,6 +29,10 @@ pub fn router(pool: SqlitePool) -> Router {
         .route("/cart/items", post(cart::add))
         .route("/cart/update", post(cart::update))
         .route("/cart/remove", post(cart::remove))
+        .route("/signin", get(account::signin_form).post(account::signin))
+        .route("/register", get(account::register_form).post(account::register))
+        .route("/signout", post(account::signout))
+        .route("/account", get(account::account))
         .fallback(not_found)
         .layer(sessions)
         .with_state(pool)

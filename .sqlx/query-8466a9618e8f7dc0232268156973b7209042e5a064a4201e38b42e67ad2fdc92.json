@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO profile (userid, langpref, favcategory, mylistopt, banneropt)\n         VALUES (?1, 'english', NULL, 0, 0)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "8466a9618e8f7dc0232268156973b7209042e5a064a4201e38b42e67ad2fdc92"
+}
