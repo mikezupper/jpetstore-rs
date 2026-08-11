@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} — JPetStore{% endblock %}
+
+{% block content %}
+<h2>{{ category.name }}</h2>
+<table>
+    <thead>
+    <tr><th>Product ID</th><th>Name</th></tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+    <tr>
+        <td><a href="/products/{{ product.id }}">{{ product.id }}</a></td>
+        <td>{{ product.name }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><a href="/">← All categories</a></p>
+{% endblock %}

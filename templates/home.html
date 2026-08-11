@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Under construction</h2>
-<p>
-    The storefront arrives in lesson 5, but the stockroom is full:
-    <strong>{{ products }} products</strong> across
-    <strong>{{ categories }} categories</strong> are seeded and waiting in
-    the database. These numbers come from live queries — if you see them,
-    the pool, the migrations, and the seed data all work.
-</p>
+<h2>Categories</h2>
+<ul>
+    {% for category in categories %}
+    <li><a href="/categories/{{ category.id }}">{{ category.name }}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}

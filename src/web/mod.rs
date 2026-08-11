@@ -1,5 +1,6 @@
+mod assets;
+mod catalog;
 mod error;
-mod home;
 
 pub use error::{AppError, AppResult};
 
@@ -8,7 +9,11 @@ use sqlx::SqlitePool;
 
 pub fn router(pool: SqlitePool) -> Router {
     Router::new()
-        .route("/", get(home::home))
+        .route("/", get(catalog::home))
+        .route("/categories/{id}", get(catalog::category))
+        .route("/products/{id}", get(catalog::product))
+        .route("/items/{id}", get(catalog::item))
+        .route("/images/{file}", get(assets::image))
         .fallback(not_found)
         .with_state(pool)
 }

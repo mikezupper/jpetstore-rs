@@ -69,11 +69,56 @@ id_impls!(ProductId);
 id_impls!(ItemId);
 
 /// Money as integer cents (see migrations/0001_schema.sql). Arithmetic on
-/// i64 is exact; formatting as dollars is a display concern that lesson 5
-/// owns, which is why there's no Display impl here yet.
+/// i64 is exact; Display is how a price becomes "$16.50" in a template,
+/// and it's the only place in the app that knows about dollar signs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, sqlx::Type)]
 #[sqlx(transparent)]
 pub struct Cents(pub i64);
+
+impl fmt::Display for Cents {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "${}.{:02}", self.0 / 100, self.0 % 100)
+    }
+}
+
+/// What a 2002 description string parses into. The seed data embeds
+/// presentation in the data — `<image src="../images/fish1.gif">Salt Water
+/// fish from Australia` — and the original's JSPs render it raw. We parse
+/// it once, here, into structure; templates render the parts and escape
+/// everything by default.
+pub struct Description {
+    /// Image filename ("fish1.gif"), if the legacy markup carried one.
+    pub image: Option<String>,
+    pub text: String,
+}
+
+pub fn parse_legacy_description(descn: &str) -> Description {
+    let mut rest = descn;
+    let mut image = None;
+
+    if let Some(start) = rest.find(r#"<image src="../images/"#) {
+        let after = &rest[start + r#"<image src="../images/"#.len()..];
+        if let Some(end) = after.find(r#"">"#) {
+            image = Some(after[..end].to_string());
+            rest = &after[end + 2..];
+        }
+    }
+
+    // The category rows also wrap their name in <font> tags. Drop any
+    // remaining tags wholesale — this is legacy cleanup, not an HTML parser.
+    let mut text = String::with_capacity(rest.len());
+    let mut in_tag = false;
+    for ch in rest.chars() {
+        match ch {
+            '<' => in_tag = true,
+            '>' => in_tag = false,
+            c if !in_tag => text.push(c),
+            _ => {}
+        }
+    }
+
+    Description { image, text: text.trim().to_string() }
+}
 
 pub struct Category {
     pub id: CategoryId,
@@ -86,6 +131,12 @@ pub struct Product {
     pub category_id: CategoryId,
     pub name: String,
     pub description: String,
+}
+
+impl Product {
+    pub fn description_parts(&self) -> Description {
+        parse_legacy_description(&self.description)
+    }
 }
 
 /// A purchasable item, joined with its live inventory count — the shape the
@@ -117,5 +168,33 @@ mod tests {
         // something actually needs to add money.
         assert!(Cents(1650) > Cents(1649));
         assert_eq!(Cents(550), Cents(550));
+    }
+
+    #[test]
+    fn cents_display_as_dollars() {
+        assert_eq!(Cents(1650).to_string(), "$16.50");
+        assert_eq!(Cents(529).to_string(), "$5.29");
+        assert_eq!(Cents(200).to_string(), "$2.00");
+    }
+
+    #[test]
+    fn legacy_descriptions_parse_into_parts() {
+        let d = parse_legacy_description(
+            r#"<image src="../images/fish1.gif">Salt Water fish from Australia"#,
+        );
+        assert_eq!(d.image.as_deref(), Some("fish1.gif"));
+        assert_eq!(d.text, "Salt Water fish from Australia");
+
+        // Category rows: icon image plus <font>-wrapped name.
+        let d = parse_legacy_description(
+            r#"<image src="../images/fish_icon.gif"><font size="5" color="blue"> Fish</font>"#,
+        );
+        assert_eq!(d.image.as_deref(), Some("fish_icon.gif"));
+        assert_eq!(d.text, "Fish");
+
+        // Plain text passes through untouched.
+        let d = parse_legacy_description("Just words");
+        assert_eq!(d.image, None);
+        assert_eq!(d.text, "Just words");
     }
 }

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — JPetStore{% endblock %}
+
+{% block content %}
+{% let parts = product.description_parts() %}
+<h2>{{ product.name }}</h2>
+{% if let Some(image) = parts.image %}
+<img src="/images/{{ image }}" alt="{{ product.name }}">
+{% endif %}
+<p>{{ parts.text }}</p>
+
+<table>
+    <thead>
+    <tr><th>Item ID</th><th>Description</th><th>Price</th><th>In stock</th></tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+        <td><a href="/items/{{ item.id }}">{{ item.id }}</a></td>
+        <td>{% if let Some(attr) = item.attribute %}{{ attr }} {% endif %}{{ product.name }}</td>
+        <td>{{ item.list_price }}</td>
+        <td>{{ item.quantity }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><a href="/categories/{{ product.category_id }}">← Back to {{ product.category_id }}</a></p>
+{% endblock %}
