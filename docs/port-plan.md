@@ -49,6 +49,13 @@ traits until lesson 12, where testing supplies the pressure that justifies
 extracting one. Abstraction is taught as a response to pressure, not a
 ritual.
 
+*Lesson 12 outcome:* the pressure never arrived. Migrated-and-seeded
+in-memory SQLite made every db test run against the real schema in
+milliseconds, so no test ever needed a mock, so no trait ever earned its
+existence. The one abstraction lesson 12 did add was the lib/bin split —
+because `tests/` genuinely demanded it. The plan's rule held; this note
+records that its honest outcome was "zero traits."
+
 Money is integer cents (`i64`), never floats.
 
 ## Lesson outline

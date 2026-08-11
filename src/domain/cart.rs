@@ -125,4 +125,55 @@ mod tests {
         assert_eq!(cart.lines().len(), 1);
         assert_eq!(cart.lines()[0].quantity, 1);
     }
+
+    mod properties {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            // The invariant lesson 7's example-based tests checked at three
+            // points, checked across the whole input space: whatever ends up
+            // in the cart, the total is the sum of the line subtotals.
+            #[test]
+            fn totals_are_the_sum_of_subtotals(
+                entries in proptest::collection::vec((0u8..8, 1i64..1_000_000, 1u32..100), 1..20)
+            ) {
+                let mut cart = Cart::default();
+                for (which, price, times) in &entries {
+                    for _ in 0..*times {
+                        cart.add(item(&format!("EST-{which}")), "x".into(), Cents(*price));
+                    }
+                }
+                let expected: i64 = cart.lines().iter().map(|l| l.subtotal().0).sum();
+                prop_assert_eq!(cart.total(), Cents(expected));
+            }
+
+            // Merging: n adds of one item is one line with quantity n
+            // (below the cap), never n lines.
+            #[test]
+            fn repeated_adds_merge(n in 1u32..200) {
+                let mut cart = Cart::default();
+                for _ in 0..n {
+                    cart.add(item("EST-1"), "x".into(), Cents(1650));
+                }
+                prop_assert_eq!(cart.lines().len(), 1);
+                prop_assert_eq!(cart.lines()[0].quantity, n);
+            }
+
+            // Hostile inputs: no price and quantity a request can smuggle in
+            // may ever panic the math or produce a negative total. This test
+            // FAILED when first written — see the lesson — and Cents's
+            // saturating arithmetic is the fix it forced.
+            #[test]
+            fn totals_never_panic_or_go_negative(
+                price in 0i64..=i64::MAX,
+                quantity in 1u32..=u32::MAX,
+            ) {
+                let mut cart = Cart::default();
+                cart.add(item("EST-1"), "x".into(), Cents(price));
+                cart.set_quantity(&item("EST-1"), quantity);
+                prop_assert!(cart.total() >= Cents(0));
+            }
+        }
+    }
 }

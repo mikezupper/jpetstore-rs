@@ -88,15 +88,20 @@ impl fmt::Display for Cents {
 // scale a unit price by a quantity, and sum subtotals. There is still no
 // `Add` — nothing in the app adds two prices directly, so that operation
 // doesn't exist yet.
+//
+// Both operations saturate instead of overflowing. Lesson 12's property
+// tests found the panic here that no realistic catalog price triggers but
+// the domain API permits; a cart total pinned at i64::MAX is absurd, but
+// absurd beats aborted.
 impl Cents {
     pub fn times(self, quantity: u32) -> Cents {
-        Cents(self.0 * i64::from(quantity))
+        Cents(self.0.saturating_mul(i64::from(quantity)))
     }
 }
 
 impl std::iter::Sum for Cents {
     fn sum<I: Iterator<Item = Cents>>(iter: I) -> Self {
-        Cents(iter.map(|c| c.0).sum())
+        iter.fold(Cents(0), |acc, c| Cents(acc.0.saturating_add(c.0)))
     }
 }
 

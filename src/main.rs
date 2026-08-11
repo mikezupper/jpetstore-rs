@@ -1,7 +1,4 @@
-mod auth;
-mod db;
-mod domain;
-mod web;
+use jpetstore_rs::{db, web};
 
 // Startup errors and request errors get different treatment on purpose:
 // if the server can't bind its port there is nothing sensible to do but
