@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO orderstatus (orderid, linenum, timestamp, status)\n         VALUES (?1, 1, date('now'), 'P')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "bf3936c45114b22b0587df9f956c52a7cf9d5ae77225f94e0a6b4b6d85df55c1"
+}

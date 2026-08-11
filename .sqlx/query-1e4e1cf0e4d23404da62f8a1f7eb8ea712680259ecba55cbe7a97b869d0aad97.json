@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT userid FROM orders WHERE orderid = ?1",
+  "describe": {
+    "columns": [
+      {
+        "name": "userid",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "orders",
+            "name": "userid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1e4e1cf0e4d23404da62f8a1f7eb8ea712680259ecba55cbe7a97b869d0aad97"
+}

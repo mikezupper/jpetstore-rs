@@ -19,7 +19,7 @@ pub(crate) async fn load(session: &Session) -> AppResult<Cart> {
     Ok(session.get::<Cart>(CART_KEY).await?.unwrap_or_default())
 }
 
-async fn save(session: &Session, cart: &Cart) -> AppResult<()> {
+pub(crate) async fn save(session: &Session, cart: &Cart) -> AppResult<()> {
     Ok(session.insert(CART_KEY, cart).await?)
 }
 

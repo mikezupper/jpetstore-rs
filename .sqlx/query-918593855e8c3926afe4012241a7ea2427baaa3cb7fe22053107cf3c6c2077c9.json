@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO lineitem (orderid, linenum, itemid, quantity, unitprice)\n             VALUES (?1, ?2, ?3, ?4, ?5)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "918593855e8c3926afe4012241a7ea2427baaa3cb7fe22053107cf3c6c2077c9"
+}

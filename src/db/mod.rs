@@ -23,4 +23,5 @@ pub async fn pool(url: &str) -> Result<SqlitePool, DbInitError> {
 }
 
 pub mod account;
+pub mod order;
 pub mod catalog;

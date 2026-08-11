@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO orders (userid, orderdate,\n               shipaddr1, shipaddr2, shipcity, shipstate, shipzip, shipcountry,\n               billaddr1, billaddr2, billcity, billstate, billzip, billcountry,\n               courier, totalprice,\n               billtofirstname, billtolastname, shiptofirstname, shiptolastname,\n               cardtype, locale)\n           VALUES (?1, date('now'),\n               ?2, NULL, ?3, ?4, ?5, ?6,\n               ?7, NULL, ?8, ?9, ?10, ?11,\n               'UPS', ?12,\n               ?13, ?14, ?15, ?16,\n               ?17, 'en_US')\n           RETURNING orderid as \"orderid!\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "orderid!",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "orders",
+            "name": "orderid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 17
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3c8186e2a155d46b156500ea10a2753edc6dc2db1bde729cabc50a95d276f78f"
+}

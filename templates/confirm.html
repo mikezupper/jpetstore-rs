@@ -35,6 +35,8 @@
 </table>
 <p><strong>Total: {{ cart.total() }}</strong></p>
 
-<p><em>The Place Order button arrives in lesson 10, wired to a transaction.</em></p>
+<form method="post" action="/orders">
+    <button><strong>Place Order</strong></button>
+</form>
 <p><a href="/checkout">← Edit addresses</a></p>
 {% endblock %}

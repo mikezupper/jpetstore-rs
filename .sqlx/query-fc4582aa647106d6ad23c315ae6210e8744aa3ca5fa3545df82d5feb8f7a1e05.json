@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE inventory SET qty = qty - ?2 WHERE itemid = ?1 AND qty >= ?2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "fc4582aa647106d6ad23c315ae6210e8744aa3ca5fa3545df82d5feb8f7a1e05"
+}

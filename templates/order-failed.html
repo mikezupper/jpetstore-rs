@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Order Not Placed — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Order not placed</h2>
+<p>{{ message }}</p>
+<p>Nothing was charged and nothing was written — the whole order rolled
+    back together.</p>
+<p><a href="/cart">← Back to your cart</a></p>
+{% endblock %}
