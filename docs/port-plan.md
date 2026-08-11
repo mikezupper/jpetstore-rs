@@ -57,6 +57,11 @@ Each lesson ends with a running app, gets a git tag (`lesson-01` …), and
 closes with one optional "now you" challenge. No solution branches; the tags
 are the canonical checkpoints.
 
+Tags are **annotated** (`git tag -a lesson-NN -m "Lesson NN checkpoint: …"`)
+and pushed explicitly (`git push origin lesson-NN`). Lightweight tags are
+easy to leave behind by accident — `git push --follow-tags` silently skips
+them, which is exactly how lesson 1's tag briefly ended up local-only.
+
 | # | Lesson | End state |
 |---|---|---|
 | 1 | The app you already know: JPetStore 6 tour, port plan, toolchain | original running via Docker; hello-world Axum server |
