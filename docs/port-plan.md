@@ -62,6 +62,27 @@ and pushed explicitly (`git push origin lesson-NN`). Lightweight tags are
 easy to leave behind by accident — `git push --follow-tags` silently skips
 them, which is exactly how lesson 1's tag briefly ended up local-only.
 
+## Lesson authoring contract
+
+Added 2026-08-11, applied to every lesson. The course teaches with a fading
+gradient: full worked example, then pattern repetition, then the
+unscaffolded challenge.
+
+1. **If a pattern is new, the lesson shows it once, in full.** If it's a
+   repetition of a shown pattern, it goes to the Build-it table instead.
+   A student must never need the answer-key diff to *learn* something —
+   only to complete or verify something.
+2. **Every lesson ends with a "Build it" block** (before the challenge):
+   a file map, a "done when" check, and the answer-key link
+   (`.../compare/lesson-(N-1)...lesson-N`).
+3. **File-map actions are one of four:** `write` (apply a pattern the
+   lesson showed), `copy` (transcription with no learning value — CSS,
+   ported DDL, seed data; take it from the diff guilt-free), `modify`
+   (small named edits to existing files), `generated` (tool output like
+   `.sqlx/`).
+4. **"Done when" is objective:** a test count, a curl output, a page
+   rendering — never "when it looks right."
+
 | # | Lesson | End state |
 |---|---|---|
 | 1 | The app you already know: JPetStore 6 tour, port plan, toolchain | original running via Docker; hello-world Axum server |
