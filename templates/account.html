@@ -5,7 +5,14 @@
 {% block content %}
 <h2>Your Account</h2>
 <p>Signed in as <strong>{{ username }}</strong>.</p>
-<p>Order history and profile editing arrive in lesson 11.</p>
+
+<p>{{ info.first_name }} {{ info.last_name }}<br>
+    {{ info.address }}<br>
+    {{ info.city }}, {{ info.state }} {{ info.zip }}, {{ info.country }}<br>
+    {{ info.email }} · {{ info.phone }}</p>
+
+<p><a href="/orders"><strong>Your orders →</strong></a></p>
+
 <form method="post" action="/signout">
     <button>Sign Out</button>
 </form>

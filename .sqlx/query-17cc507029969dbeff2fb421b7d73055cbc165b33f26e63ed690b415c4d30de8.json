@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT favcategory as \"favorite_category\", mylistopt as \"my_list!: bool\",\n                  banneropt as \"banner!: bool\"\n           FROM profile WHERE userid = ?1",
+  "describe": {
+    "columns": [
+      {
+        "name": "favorite_category",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "profile",
+            "name": "favcategory"
+          }
+        }
+      },
+      {
+        "name": "my_list!: bool",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "profile",
+            "name": "mylistopt"
+          }
+        }
+      },
+      {
+        "name": "banner!: bool",
+        "ordinal": 2,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "profile",
+            "name": "banneropt"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "17cc507029969dbeff2fb421b7d73055cbc165b33f26e63ed690b415c4d30de8"
+}

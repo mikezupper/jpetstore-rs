@@ -122,6 +122,59 @@ pub async fn owner(pool: &SqlitePool, order_id: i64) -> Result<Option<String>, s
         .await
 }
 
+use crate::domain::catalog::Cents;
+use crate::domain::order::{OrderLine, OrderSummary};
+
+pub async fn history(pool: &SqlitePool, username: &str) -> Result<Vec<OrderSummary>, sqlx::Error> {
+    sqlx::query_as!(
+        OrderSummary,
+        r#"SELECT orderid as "id!: i64", orderdate as "date!: String",
+                  totalprice as "total!: Cents"
+           FROM orders WHERE userid = ?1 ORDER BY orderid DESC"#,
+        username
+    )
+    .fetch_all(pool)
+    .await
+}
+
+/// Existence and ownership answered by one query: the WHERE clause only
+/// matches this user's order, so "not yours" and "not real" are both None —
+/// the same 404 upstream, decided in SQL instead of two round trips.
+pub async fn summary_for(
+    pool: &SqlitePool,
+    order_id: i64,
+    username: &str,
+) -> Result<Option<OrderSummary>, sqlx::Error> {
+    sqlx::query_as!(
+        OrderSummary,
+        r#"SELECT orderid as "id!: i64", orderdate as "date!: String",
+                  totalprice as "total!: Cents"
+           FROM orders WHERE orderid = ?1 AND userid = ?2"#,
+        order_id,
+        username
+    )
+    .fetch_optional(pool)
+    .await
+}
+
+/// Lines joined with the catalog for display names — but the price comes
+/// from lineitem, where lesson 10 froze it, not from the item table.
+pub async fn lines(pool: &SqlitePool, order_id: i64) -> Result<Vec<OrderLine>, sqlx::Error> {
+    sqlx::query_as!(
+        OrderLine,
+        r#"SELECT li.itemid as "item_id: ItemId", p.name as "name!",
+                  i.attr1 as "attribute", li.quantity as "quantity!: i64",
+                  li.unitprice as "unit_price!: Cents"
+           FROM lineitem li
+           JOIN item i ON i.itemid = li.itemid
+           JOIN product p ON p.productid = i.productid
+           WHERE li.orderid = ?1 ORDER BY li.linenum"#,
+        order_id
+    )
+    .fetch_all(pool)
+    .await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -196,6 +249,26 @@ mod tests {
         let est1: i64 = sqlx::query_scalar("SELECT qty FROM inventory WHERE itemid = 'EST-1'")
             .fetch_one(&pool).await.unwrap();
         assert_eq!(est1, 10000);
+    }
+
+    #[tokio::test]
+    async fn history_and_detail_read_back_what_place_wrote() {
+        let pool = test_pool().await;
+        let id = place(&pool, "j2ee", &draft(), &cart()).await.unwrap();
+
+        let mine = history(&pool, "j2ee").await.unwrap();
+        assert_eq!(mine.len(), 1);
+        assert_eq!(mine[0].total, Cents(2 * 1650 + 550));
+
+        let order_lines = lines(&pool, id).await.unwrap();
+        assert_eq!(order_lines.len(), 2);
+        assert_eq!(order_lines[0].name, "Angelfish");
+        assert_eq!(order_lines[0].subtotal(), Cents(3300));
+
+        // Ownership folded into the query: ACID sees nothing.
+        assert!(summary_for(&pool, id, "j2ee").await.unwrap().is_some());
+        assert!(summary_for(&pool, id, "ACID").await.unwrap().is_none());
+        assert!(history(&pool, "ACID").await.unwrap().is_empty());
     }
 
     #[tokio::test]

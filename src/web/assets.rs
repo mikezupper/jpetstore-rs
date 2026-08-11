@@ -35,6 +35,11 @@ pub async fn image(Path(name): Path<String>) -> Response {
         "cat1.gif" => gif!("cat1.gif"),
         "cat2.gif" => gif!("cat2.gif"),
         "bird1.gif" => gif!("bird1.gif"),
+        "banner_fish.gif" => gif!("banner_fish.gif"),
+        "banner_cats.gif" => gif!("banner_cats.gif"),
+        "banner_dogs.gif" => gif!("banner_dogs.gif"),
+        "banner_reptiles.gif" => gif!("banner_reptiles.gif"),
+        "banner_birds.gif" => gif!("banner_birds.gif"),
         "bird2.gif" => gif!("bird2.gif"),
         _ => AppError::NotFound.into_response(),
     }

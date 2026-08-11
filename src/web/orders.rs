@@ -56,6 +56,41 @@ struct OrderPlacedTemplate {
     order_id: i64,
 }
 
+#[derive(Template)]
+#[template(path = "orders.html")]
+struct OrdersTemplate {
+    orders: Vec<crate::domain::order::OrderSummary>,
+}
+
+pub async fn history(
+    AuthUser(username): AuthUser,
+    State(pool): State<SqlitePool>,
+) -> AppResult<Html<String>> {
+    let orders = db::order::history(&pool, &username).await?;
+    Ok(Html(OrdersTemplate { orders }.render()?))
+}
+
+#[derive(Template)]
+#[template(path = "order.html")]
+struct OrderTemplate {
+    summary: crate::domain::order::OrderSummary,
+    lines: Vec<crate::domain::order::OrderLine>,
+}
+
+pub async fn detail(
+    AuthUser(username): AuthUser,
+    State(pool): State<SqlitePool>,
+    Path(order_id): Path<i64>,
+) -> AppResult<Html<String>> {
+    // summary_for answers existence and ownership in one query — None is
+    // the same 404 whether the order is missing or merely someone else's.
+    let summary = db::order::summary_for(&pool, order_id, &username)
+        .await?
+        .ok_or(AppError::NotFound)?;
+    let lines = db::order::lines(&pool, order_id).await?;
+    Ok(Html(OrderTemplate { summary, lines }.render()?))
+}
+
 pub async fn placed(
     AuthUser(username): AuthUser,
     State(pool): State<SqlitePool>,

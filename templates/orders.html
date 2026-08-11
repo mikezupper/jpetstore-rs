@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Your Orders — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Your Orders</h2>
+
+{% if orders.is_empty() %}
+<p>No orders yet. <a href="/">The fish are waiting.</a></p>
+{% else %}
+<table>
+    <thead>
+    <tr><th>Order</th><th>Date</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr>
+        <td><a href="/orders/{{ order.id }}">#{{ order.id }}</a></td>
+        <td>{{ order.date }}</td>
+        <td>{{ order.total }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<p><a href="/account">← Your account</a></p>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ summary.id }} — JPetStore{% endblock %}
+
+{% block content %}
+<h2>Order #{{ summary.id }}</h2>
+<p>Placed {{ summary.date }}.</p>
+
+<table>
+    <thead>
+    <tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit price</th><th>Subtotal</th></tr>
+    </thead>
+    <tbody>
+    {% for line in lines %}
+    <tr>
+        <td><a href="/items/{{ line.item_id }}">{{ line.item_id }}</a></td>
+        <td>{% if let Some(attr) = line.attribute %}{{ attr }} {% endif %}{{ line.name }}</td>
+        <td>{{ line.quantity }}</td>
+        <td>{{ line.unit_price }}</td>
+        <td>{{ line.subtotal() }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><strong>Total: {{ summary.total }}</strong></p>
+
+<p><a href="/orders">← All orders</a></p>
+{% endblock %}

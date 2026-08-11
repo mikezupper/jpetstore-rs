@@ -12,6 +12,12 @@ use crate::{auth, db};
 
 const USER_KEY: &str = "user";
 
+/// The signed-in username if there is one — for pages that personalize but
+/// don't require sign-in (the home page). Gated pages use AuthUser instead.
+pub(crate) async fn current_user(session: &Session) -> Option<String> {
+    session.get::<String>(USER_KEY).await.ok().flatten()
+}
+
 /// A signed-in username, proven by existing. Handlers that take an AuthUser
 /// argument are gated: axum runs this extractor first, and a visitor with
 /// no session user never reaches the handler body — they're already on
@@ -154,8 +160,13 @@ pub async fn register(
 #[template(path = "account.html")]
 struct AccountTemplate {
     username: String,
+    info: crate::domain::account::AccountInfo,
 }
 
-pub async fn account(AuthUser(username): AuthUser) -> AppResult<Html<String>> {
-    Ok(Html(AccountTemplate { username }.render()?))
+pub async fn account(
+    AuthUser(username): AuthUser,
+    State(pool): State<SqlitePool>,
+) -> AppResult<Html<String>> {
+    let info = db::account::info(&pool, &username).await?.ok_or(AppError::NotFound)?;
+    Ok(Html(AccountTemplate { username, info }.render()?))
 }

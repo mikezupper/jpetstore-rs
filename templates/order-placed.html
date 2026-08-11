@@ -6,6 +6,6 @@
 <h2>Thank you!</h2>
 <p>Order <strong>#{{ order_id }}</strong> is placed and your animals are on
     their way (status: pending, courier: UPS — some things never change).</p>
-<p>Order history arrives in lesson 11.</p>
+<p><a href="/orders/{{ order_id }}">View the order</a> or <a href="/orders">all your orders</a>.</p>
 <p><a href="/">← Keep shopping</a></p>
 {% endblock %}

@@ -2,6 +2,7 @@ use askama::Template;
 use axum::extract::{Path, Query, State};
 use axum::response::Html;
 use sqlx::SqlitePool;
+use tower_sessions::Session;
 
 use crate::db;
 use crate::domain::catalog::{Category, CategoryId, Item, ItemId, Product, ProductId};
@@ -11,11 +12,39 @@ use crate::web::{parse_id, AppError, AppResult};
 #[template(path = "home.html")]
 struct HomeTemplate {
     categories: Vec<Category>,
+    banner_image: Option<String>,
+    favorite_name: Option<String>,
+    favorites: Vec<Product>,
 }
 
-pub async fn home(State(pool): State<SqlitePool>) -> AppResult<Html<String>> {
+// The home page personalizes when someone is signed in — the profile's
+// banner and MyList options, straight from the original — but it never
+// *requires* sign-in, which is why it reads current_user instead of
+// taking an AuthUser.
+pub async fn home(State(pool): State<SqlitePool>, session: Session) -> AppResult<Html<String>> {
     let categories = db::catalog::categories(&pool).await?;
-    Ok(Html(HomeTemplate { categories }.render()?))
+
+    let mut banner_image = None;
+    let mut favorite_name = None;
+    let mut favorites = Vec::new();
+
+    if let Some(username) = crate::web::account::current_user(&session).await {
+        if let Some(prefs) = db::account::prefs(&pool, &username).await? {
+            if let Some(fav) = prefs.favorite_category {
+                if prefs.banner {
+                    banner_image = db::account::banner_image(&pool, &fav).await?;
+                }
+                if prefs.my_list {
+                    if let Ok(id) = CategoryId::try_from(fav) {
+                        favorites = db::catalog::products_in_category(&pool, &id).await?;
+                        favorite_name = Some(id.to_string());
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(Html(HomeTemplate { categories, banner_image, favorite_name, favorites }.render()?))
 }
 
 #[derive(Template)]

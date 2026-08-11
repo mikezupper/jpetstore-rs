@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT li.itemid as \"item_id: ItemId\", p.name as \"name!\",\n                  i.attr1 as \"attribute\", li.quantity as \"quantity!: i64\",\n                  li.unitprice as \"unit_price!: Cents\"\n           FROM lineitem li\n           JOIN item i ON i.itemid = li.itemid\n           JOIN product p ON p.productid = i.productid\n           WHERE li.orderid = ?1 ORDER BY li.linenum",
+  "describe": {
+    "columns": [
+      {
+        "name": "item_id: ItemId",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "lineitem",
+            "name": "itemid"
+          }
+        }
+      },
+      {
+        "name": "name!",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "product",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "name": "attribute",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "item",
+            "name": "attr1"
+          }
+        }
+      },
+      {
+        "name": "quantity!: i64",
+        "ordinal": 3,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "lineitem",
+            "name": "quantity"
+          }
+        }
+      },
+      {
+        "name": "unit_price!: Cents",
+        "ordinal": 4,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "lineitem",
+            "name": "unitprice"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "5bfe2ac7255ab7a90675476d82ca03fc9db98bbceaa41bdd377942bfaa03cd09"
+}

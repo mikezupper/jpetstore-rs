@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT bannername FROM bannerdata WHERE favcategory = ?1",
+  "describe": {
+    "columns": [
+      {
+        "name": "bannername",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "bannerdata",
+            "name": "bannername"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "393cc4cef266fc60d5abaf6165cc57397b011c7b85732662e6d28a0910a3f565"
+}

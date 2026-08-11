@@ -1,10 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if let Some(image) = banner_image %}
+<p><img src="/images/{{ image }}" alt="Your favorite category"></p>
+{% endif %}
+
 <h2>Categories</h2>
 <ul>
     {% for category in categories %}
     <li><a href="/categories/{{ category.id }}">{{ category.name }}</a></li>
     {% endfor %}
 </ul>
+
+{% if let Some(name) = favorite_name %}
+<h2>Your {{ name }} list</h2>
+<ul>
+    {% for product in favorites %}
+    <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}

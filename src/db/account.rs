@@ -1,7 +1,50 @@
 use sqlx::SqlitePool;
 
-use crate::domain::account::NewAccount;
+use crate::domain::account::{AccountInfo, NewAccount, Prefs};
 use crate::domain::order::Address;
+
+pub async fn info(pool: &SqlitePool, username: &str) -> Result<Option<AccountInfo>, sqlx::Error> {
+    sqlx::query_as!(
+        AccountInfo,
+        r#"SELECT email as "email!", phone as "phone!",
+                  firstname as "first_name!", lastname as "last_name!",
+                  addr1 as "address!", city as "city!", state as "state!",
+                  zip as "zip!", country as "country!"
+           FROM account WHERE userid = ?1"#,
+        username
+    )
+    .fetch_optional(pool)
+    .await
+}
+
+pub async fn prefs(pool: &SqlitePool, username: &str) -> Result<Option<Prefs>, sqlx::Error> {
+    sqlx::query_as!(
+        Prefs,
+        r#"SELECT favcategory as "favorite_category", mylistopt as "my_list!: bool",
+                  banneropt as "banner!: bool"
+           FROM profile WHERE userid = ?1"#,
+        username
+    )
+    .fetch_optional(pool)
+    .await
+}
+
+/// The favorite category's banner image, already parsed out of the legacy
+/// markup the bannerdata table stores.
+pub async fn banner_image(
+    pool: &SqlitePool,
+    favcategory: &str,
+) -> Result<Option<String>, sqlx::Error> {
+    let legacy: Option<Option<String>> = sqlx::query_scalar!(
+        "SELECT bannername FROM bannerdata WHERE favcategory = ?1",
+        favcategory
+    )
+    .fetch_optional(pool)
+    .await?;
+    Ok(legacy
+        .flatten()
+        .and_then(|html| crate::domain::catalog::parse_legacy_description(&html).image))
+}
 
 /// The account's address block, shaped for prefilling checkout forms.
 pub async fn address(pool: &SqlitePool, username: &str) -> Result<Option<Address>, sqlx::Error> {

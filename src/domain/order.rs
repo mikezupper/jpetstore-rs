@@ -10,6 +10,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::catalog::Cents;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Address {
     pub first_name: String,
@@ -75,6 +77,32 @@ pub struct OrderDraft {
     pub ship: Address,
     pub bill: Address,
     pub card_type: CardType,
+}
+
+/// One row of order history. The date is a plain "YYYY-MM-DD" string —
+/// SQLite stores it that way, the page shows it that way, and nothing in
+/// between does date arithmetic, so a chrono dependency would be ceremony.
+pub struct OrderSummary {
+    pub id: i64,
+    pub date: String,
+    pub total: Cents,
+}
+
+/// A line read back from a placed order, joined with the catalog for its
+/// display name. The price is the one lesson 10 wrote — history shows what
+/// you paid, not what the item costs today.
+pub struct OrderLine {
+    pub item_id: crate::domain::catalog::ItemId,
+    pub name: String,
+    pub attribute: Option<String>,
+    pub quantity: i64,
+    pub unit_price: Cents,
+}
+
+impl OrderLine {
+    pub fn subtotal(&self) -> Cents {
+        self.unit_price.times(self.quantity as u32)
+    }
 }
 
 #[cfg(test)]
