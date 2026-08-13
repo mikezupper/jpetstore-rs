@@ -1,0 +1,6 @@
+# The entire ingress config. With SITE_ADDRESS set to a real domain,
+# Caddy obtains and renews certificates automatically — TLS is not a
+# project, it's a line. Locally, SITE_ADDRESS=":80" serves plain http.
+{$SITE_ADDRESS} {
+    reverse_proxy petstore:8081
+}

@@ -1,5 +1,5 @@
-# The whole deployment, described once. One-time host setup — the volume is
-# external so no compose command can ever delete the database:
+# The whole deployment, described once. One-time host setup — the data
+# volume is external so no compose command can ever delete the database:
 #
 #   docker volume create jpetstore-data
 #
@@ -7,8 +7,9 @@ services:
   petstore:
     image: ${IMAGE:-registry.livepeer.tools/jpetstore-rs}:${TAG:-latest}
     restart: unless-stopped
-    ports:
-      - "${HOST_PORT:-8081}:8081"
+    # No published port: since lesson 7, Caddy is the only way in.
+    expose:
+      - "8081"
     volumes:
       - jpetstore-data:/data
     healthcheck:
@@ -19,7 +20,23 @@ services:
       retries: 3
       start_period: 5s
 
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates live here. Not external on purpose: losing this volume
+      # costs a re-issue, not data — though Let's Encrypt rate limits mean
+      # you shouldn't make a habit of it.
+      - caddy-data:/data
+
 volumes:
   jpetstore-data:
     external: true
     name: ${DATA_VOLUME:-jpetstore-data}
+  caddy-data:
