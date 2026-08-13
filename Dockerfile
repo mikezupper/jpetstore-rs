@@ -1,22 +1,22 @@
-# Two stages: a builder with the whole Rust toolchain, and a runtime that
-# gets exactly one file from it. SQLX_OFFLINE makes the query macros verify
-# against the committed .sqlx cache — the same property that lets a fresh
-# clone compile (lesson 4) lets a build container compile with no database.
-FROM rust:1.95-slim AS builder
+# The endgame: a statically linked musl binary in an empty image. The
+# builder is Alpine (musl-native), build-base supplies the C compiler the
+# bundled SQLite needs, and the runtime stage is FROM scratch — no shell,
+# no package manager, no libc, nothing to patch or exploit. The image IS
+# the binary, plus an empty /data directory and a numeric user.
+FROM rust:1.95-alpine AS builder
+RUN apk add --no-cache build-base
 WORKDIR /app
 COPY . .
 ENV SQLX_OFFLINE=true
-RUN cargo build --release
+RUN cargo build --release \
+    && mkdir -p /data && chown 10001:10001 /data
 
-# The runtime stage: the binary is the whole application — templates,
-# migrations, and the pet pictures are compiled in. The only thing that
-# lives outside it is the SQLite file on /data.
-FROM debian:bookworm-slim
-RUN useradd -r -u 10001 jpetstore && mkdir -p /data && chown jpetstore:jpetstore /data
-COPY --from=builder /app/target/release/jpetstore-rs /usr/local/bin/jpetstore-rs
-USER jpetstore
+FROM scratch
+COPY --from=builder /app/target/release/jpetstore-rs /jpetstore-rs
+COPY --from=builder --chown=10001:10001 /data /data
+USER 10001:10001
 ENV DATABASE_URL=sqlite:/data/jpetstore.db
 ENV BIND_ADDR=0.0.0.0:8081
 EXPOSE 8081
 VOLUME /data
-CMD ["jpetstore-rs"]
+ENTRYPOINT ["/jpetstore-rs"]
