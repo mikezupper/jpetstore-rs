@@ -1,0 +1,25 @@
+# The whole deployment, described once. One-time host setup — the volume is
+# external so no compose command can ever delete the database:
+#
+#   docker volume create jpetstore-data
+#
+services:
+  petstore:
+    image: ${IMAGE:-registry.livepeer.tools/jpetstore-rs}:${TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8081}:8081"
+    volumes:
+      - jpetstore-data:/data
+    healthcheck:
+      # The binary probes itself — a scratch image has no curl to borrow.
+      test: ["CMD", "/jpetstore-rs", "healthcheck"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  jpetstore-data:
+    external: true
+    name: ${DATA_VOLUME:-jpetstore-data}

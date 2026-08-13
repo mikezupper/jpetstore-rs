@@ -21,6 +21,7 @@ pub fn router(pool: SqlitePool) -> Router {
     let sessions = SessionManagerLayer::new(MemoryStore::default()).with_secure(false);
 
     Router::new()
+        .route("/healthz", get(healthz))
         .route("/", get(catalog::home))
         .route("/search", get(catalog::search))
         .route("/categories/{id}", get(catalog::category))
@@ -56,4 +57,16 @@ pub(crate) fn parse_id<T: TryFrom<String>>(raw: String) -> Result<T, AppError> {
 // by AppError's IntoResponse impl, never a panic.
 async fn not_found() -> AppError {
     AppError::NotFound
+}
+
+// One query deep on purpose: "healthy" means the process serves AND the
+// database on the volume answers. A runtime-checked query is fine here —
+// there's no row shape to verify, just liveness.
+async fn healthz(
+    axum::extract::State(pool): axum::extract::State<SqlitePool>,
+) -> AppResult<String> {
+    let products: i64 = sqlx::query_scalar("SELECT count(*) FROM product")
+        .fetch_one(&pool)
+        .await?;
+    Ok(format!("ok — {products} products"))
 }
