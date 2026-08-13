@@ -7,14 +7,21 @@ use jpetstore_rs::{db, web};
 // that render as error pages (see web/error.rs).
 #[tokio::main]
 async fn main() {
-    let pool = db::pool("sqlite:jpetstore.db")
-        .await
-        .expect("database init failed");
+    // The two facts that change between a laptop and a server — where the
+    // database lives, and what to bind — cross the boundary as environment
+    // variables. The defaults are exactly the course's dev behavior, so
+    // `cargo run` works the same as it has since lesson 1.
+    let db_url =
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:jpetstore.db".to_string());
+    let bind_addr =
+        std::env::var("BIND_ADDR").unwrap_or_else(|_| "127.0.0.1:8081".to_string());
+
+    let pool = db::pool(&db_url).await.expect("database init failed");
     let app = web::router(pool);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8081")
+    let listener = tokio::net::TcpListener::bind(&bind_addr)
         .await
-        .expect("could not bind 127.0.0.1:8081 — is another jpetstore-rs running?");
+        .unwrap_or_else(|e| panic!("could not bind {bind_addr}: {e}"));
     println!("jpetstore-rs listening on http://{}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.expect("server error");
 }
