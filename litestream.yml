@@ -1,0 +1,9 @@
+# Continuous SQLite replication. The default replica is a local volume so
+# the whole lesson runs without a cloud account; production points
+# LITESTREAM_REPLICA_URL at S3/R2 (s3://bucket/jpetstore) with
+# LITESTREAM_ACCESS_KEY_ID / LITESTREAM_SECRET_ACCESS_KEY set — the config
+# doesn't change, only the environment does.
+dbs:
+  - path: /data/jpetstore.db
+    replicas:
+      - url: ${LITESTREAM_REPLICA_URL}
