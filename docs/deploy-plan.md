@@ -1,10 +1,19 @@
 # Ship the Port — deploy-course plan
 
-The production spec for paid course #1, **"Ship the Port: Deploy Rust to a
+The production spec — now the production *record* — for paid course #1, **"Ship the Port: Deploy Rust to a
 Server You Own"** (slug `ship-the-port`), scoped 2026-08-12. The
 [port plan](port-plan.md)'s lesson authoring contract applies unchanged:
 every new pattern shown once in full, a Build-it table with an objective
 done-when, one challenge per lesson, answer keys as tag-to-tag diffs.
+
+**Status: BUILT 2026-08-13.** All nine checkpoints tagged (`deploy-01` …
+`deploy-09`, every one verified live: the 7.73 MB scratch image, real
+registry pushes and pulls, the compose healthcheck via the self-probing
+binary, and the full Litestream restore drill — which surfaced the
+root-owned-restore-file crash-loop now taught in lesson 8). Lessons 01–09
+are written, linted, gated behind learn.mikezupper.com, and absent from
+the static build. The musl verification the plan required passed on the
+first attempt.
 
 ## Premise and audience
 
